@@ -6,3 +6,5 @@
 #pragma once
 
 // TODO: Hier auf zusätzliche Header, die das Programm erfordert, verweisen.
+
+#define NULL 0

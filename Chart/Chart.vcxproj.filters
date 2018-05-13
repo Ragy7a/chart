@@ -36,6 +36,12 @@
     <ClInclude Include="TPoint.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="TCurrLine.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="stack.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="app.rc">
@@ -62,6 +68,9 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="TPoint.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="stack.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>

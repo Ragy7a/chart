@@ -1,10 +1,22 @@
 #pragma once
 #include "TChart.h"
-class TPoint :
-	public TChart
+class TPoint :	public TRoot
 {
+protected:
+	int x, y;
+
+	void SetX(int _x);
+	void SetY(int _y);
+
 public:
-	TPoint();
+	TPoint(int _x = 0, int _y = 0);
 	~TPoint();
+
+	virtual void Show(Graphics^ gr);
+	virtual void Hide(Graphics^ gr);
+	virtual void Move(Graphics^ gr, int dx, int dy);
+
+	int GetX();
+	int GetY();
 };
 
