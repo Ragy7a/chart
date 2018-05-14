@@ -5,7 +5,7 @@
 #include "TCurrLine.h"
 
 
-TChart::TChart(TRoot *pB = NULL, TRoot *pE = NULL) {
+TChart::TChart(TRoot *pB, TRoot *pE) {
 	pBegin = pB;
 	pEnd = pE;
 }
@@ -60,7 +60,7 @@ TRoot* TChart::Show(Graphics^ gr, TRoot *curr) {
 	return tp;
 }
 
-void TChart::Show(Graphics ^gr) {
+void TChart::Draw(Graphics^ gr, Pen^ pen) {
 	TCurrLine curr;
 	TPoint *tmp;
 
@@ -80,7 +80,7 @@ void TChart::Show(Graphics ^gr) {
 			}
 			else {
 				stack.push(curr);
-				curr.tC = curr.tC->GetBegin();
+				curr.tC = dynamic_cast<TChart*>(curr.tC->GetBegin());
 			}
 			if (curr.pE == NULL) {
 				tmp = dynamic_cast<TPoint*>(curr.tC->GetEnd());
@@ -96,7 +96,7 @@ void TChart::Show(Graphics ^gr) {
 			}
 
 			if ((curr.pB != NULL) && (curr.pE != NULL)) {
-				gr->DrawLine(Pens::Black,
+				gr->DrawLine(pen,
 					Point(curr.pB->GetX(), curr.pB->GetY()),
 					Point(curr.pE->GetX(), curr.pE->GetY())
 				);
@@ -114,6 +114,42 @@ void TChart::Show(Graphics ^gr) {
 			}
 		}
 	}
+}
+
+void TChart::Show(Graphics ^gr) {
+	Draw(gr, Pens::Black);
+}
+
+void TChart::Hide(Graphics^ gr) {
+	Draw(gr, Pens::White);
+}
+
+TRoot* TChart::Move(Graphics^ gr, TRoot* curr, int dx, int dy) {
+	TPoint *tp;
+	TChart *tc;
+
+	tp = dynamic_cast<TPoint*>(curr);
+	if (tp != NULL) {
+		tp->Move(gr, dx, dy);
+		return tp;
+	}
+	else {
+		tc = dynamic_cast<TChart*>(curr);
+		if (tc != NULL) {
+			TPoint* bp = dynamic_cast<TPoint*>(Move(gr, tc->GetBegin(), dx, dy));
+			TPoint* ep = dynamic_cast<TPoint*>(Move(gr, tc->GetEnd(), dx, dy));
+
+			return ep;
+		}
+		return tc;
+	}
+	return tp;
+}
+
+void TChart::Move(Graphics^ gr, int dx, int dy) {
+	Hide(gr);
+	Move(gr, pBegin, dx, dy);
+	Show(gr);
 }
 
 bool TChart::Find(int tx, int ty) {
@@ -166,10 +202,20 @@ bool TChart::Find(int tx, int ty) {
 			}
 		}
 	}
+
+	return false;
 }
 
 bool TChart::GetFirst() {
 	return first;
+}
+
+TChart* TChart::GetRes() {
+	return pRes;
+}
+
+void TChart::SetRes(TChart* res) {
+	pRes = res;
 }
 
 

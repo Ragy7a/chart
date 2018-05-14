@@ -2,11 +2,12 @@
 #include <stack>
 
 template<class T>
-class stack {
-	std::stack<T> stack;
+class Stack {
+private:
+	std::stack<T> st;
 public: 
-	stack(int _size = 100);
-	~stack() {};
+	Stack();
+	~Stack() {};
 
 	void push(T element);
 	T pop();
@@ -18,46 +19,47 @@ public:
 };
 
 template<class T>
-stack::stack(int _size = 100) {
-	stack = std::stack<T>(100);
+Stack<T>::Stack() {
+	std::stack<T> tmp;
+	st = tmp;
 }
 
 template<class T>
-void stack::push(T element) {
-	stack.push(element);
+void Stack<T>::push(T element) {
+	st.push(element);
 }
 
 template<class T>
-T stack::pop() {
-	T tmp = stack.top();
-	stack.pop();
+T Stack<T>::pop() {
+	T tmp = st.top();
+	st.pop();
 
 	return tmp;
 }
 
 template<class T>
-T stack::top() {
-	return stack.tmp();
+T Stack<T>::top() {
+	return st.top();
 }
 
 template<class T>
-void stack::PopWithoutReturning() {
-	stack.pop();
+void Stack<T>::PopWithoutReturning() {
+	st.pop();
 }
 
 template<class T>
-int stack::size() {
-	return stack.size();
+int Stack<T>::size() {
+	return st.size();
 }
 
 template<class T>
-void stack::clear() {
+void Stack<T>::clear() {
 	std::stack<T> tmp;
-
-	stack = tmp;
+	
+	st = tmp;
 }
 
 template<class T>
-bool isEmpty() {
-	return stack.empty();
+bool Stack<T>::isEmpty() {
+	return st.empty();
 }

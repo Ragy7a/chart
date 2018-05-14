@@ -2,7 +2,7 @@
 #include "TPoint.h"
 
 
-TPoint::TPoint(int _x = 0, int _y = 0){
+TPoint::TPoint(int _x, int _y){
 	x = _x;
 	y = _y;
 }

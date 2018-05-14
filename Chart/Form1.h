@@ -94,16 +94,16 @@ namespace CppCLR_WinformsProjekt {
 #pragma endregion
 	private: System::Void pictureBox_MouseDown(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
 		flag = true;
-		x1 = x2 = e->x;
-		y1 = y2 = e->y;
+		x1 = x2 = e->X;
+		y1 = y2 = e->Y;
 	}
 
 	private: System::Void pictureBox_MouseMove(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
 		if (flag) {
 			gr->DrawLine(Pens::White, x1, y1, x2, y2);
 
-			x2 = e->x;
-			y2 = e->y;
+			x2 = e->X;
+			y2 = e->Y;
 			
 			gr->DrawLine(Pens::Black, x1, y1, x2, y2);
 		}
@@ -126,32 +126,32 @@ namespace CppCLR_WinformsProjekt {
 			if (pFirst->Find(x1, y1)) {
 				p2 = new TPoint(x2, y2);
 
-				if (pFirst->first) {
-					p1 = pFirst->pRes->GetBegin();
+				if (pFirst->GetFirst()) {
+					p1 = dynamic_cast<TPoint*>(pFirst->GetRes()->GetBegin());
 				}
 				else {
-					p1 = pFirst->pRes->GetEnd();
+					p1 = dynamic_cast<TPoint*>(pFirst->GetRes()->GetEnd());
 				}
 				tmp->SetBegin(p2);
 				tmp->SetEnd(p1);
 
-				tmpRes = pRes;
+				tmpRes = pFirst->GetRes();
 
-				if (pFirst->first) {
-					pRes->SetBegin(tmp);
+				if (pFirst->GetFirst()) {
+					tmpRes->SetBegin(tmp);
 				}
 				else {
-					pRes->SetEnd(tmp);
+					tmpRes->SetEnd(tmp);
 				}
 			}
 
 			if (pFirst->Find(x2, y2)) {
 
-				if (pFirst->first) {
-					p2 = pFirst->pRes->GetBegin();
+				if (pFirst->GetFirst()) {
+					p2 = dynamic_cast<TPoint*>(pFirst->GetRes()->GetBegin());
 				}
 				else {
-					p2 = pFirst->pRes->GetEnd();
+					p2 = dynamic_cast<TPoint*>(pFirst->GetRes()->GetEnd());
 				}
 				if (tmpRes != NULL) {
 					tmp->SetBegin(p2);
@@ -166,11 +166,13 @@ namespace CppCLR_WinformsProjekt {
 					tmp->SetEnd(p1);
 				}
 
-				if (pFirst->first) {
-					pRes->SetBegin(tmp);
+				tmpRes = pFirst->GetRes();
+
+				if (pFirst->GetFirst()) {
+					tmpRes->SetBegin(tmp);
 				}
 				else {
-					pRes->SetEnd(tmp);
+					tmpRes->SetEnd(tmp);
 				}
 			}
 		}
