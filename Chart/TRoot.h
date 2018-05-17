@@ -16,11 +16,11 @@ public:
 	virtual void Hide(Graphics^ gr) = 0;
 	virtual void Move(Graphics^ gr, int dx, int dy) = 0;
 	
-	bool GetActive(Graphics^ gr) {
+	bool GetActive() {
 		return active;
 	}
 
-	bool GetVisible(Graphics^ gr) {
+	bool GetVisible() {
 		return visible;
 	}
 };

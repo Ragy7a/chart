@@ -11,11 +11,9 @@ protected:
 	bool first;
 	Stack<TCurrLine> stack;
 
-	void Draw(Graphics^ gr, Pen^ pen);
-
 public:
 	TChart(TRoot *pB = NULL, TRoot *pE = NULL);
-	~TChart();
+	~TChart() {};
 
 	void SetBegin(TRoot *pB);
 	void SetEnd(TRoot *pE);
@@ -26,8 +24,12 @@ public:
 	virtual void Hide(Graphics^ gr);
 	virtual void Move(Graphics^ gr, int dx, int dy);
 
-	TRoot* Show(Graphics^ gr, TRoot *curr);
+	void Draw(Graphics^ gr, Pen^ pen);
+
+	TRoot* Draw(Graphics^ gr, TRoot *curr, Pen^ pen);
 	TRoot* Move(Graphics^ gr, TRoot *curr, int dx ,int dy);
+
+	bool FindLine(int tx, int ty);
 
 	bool Find(int tx, int ty);
 
