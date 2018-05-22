@@ -105,9 +105,8 @@ void TChart::Draw(Graphics^ gr, Pen^ pen) {
 		if ((curr.pB != NULL) && (curr.pE != NULL)) {
 			Pen^ tmpPen = pen;
 
-			if ((pen != Pens::White) && (curr.tC->active == true)) {
-				pen =  gcnew Pen(Brushes::Cyan, 20.f);
-				gr->FillEllipse(Brushes::Red, 0, 0, 100, 100);
+			if (curr.tC->active == true) {
+				pen =  gcnew Pen(Brushes::Red, 3.0f);
 			}
 			gr->DrawLine(pen,
 				Point(curr.pB->GetX(), curr.pB->GetY()),
@@ -137,7 +136,8 @@ void TChart::Show(Graphics ^gr) {
 }
 
 void TChart::Hide(Graphics^ gr) {
-	Draw(gr, Pens::White);
+	Pen ^pen = gcnew Pen(Color::White, 3.0f);
+	Draw(gr, pen);
 	visible = false;
 }
 
@@ -275,11 +275,12 @@ bool TChart::FindLine(int x0, int y0) {
 
 			if (distance < 30.0) {
 				pRes = curr.tC;
-				pRes->active = true;
+				if (pRes->active == true) pRes->active = false;
+				else pRes->active = true;
 				isFounded = true;
 			}
 			else {
-				pRes->active = false;
+				curr.tC->active = false;
 			}
 
 			tmp = curr.pE;
@@ -312,6 +313,53 @@ TChart* TChart::GetRes() {
 
 void TChart::SetRes(TChart* res) {
 	pRes = res;
+}
+
+bool TChart::Delete() {
+	if (pRes == NULL) return false;
+	TCurrLine curr;
+	TPoint *tmp;
+	TChart *prev;
+
+	curr.tC = this;
+	curr.pB = NULL;
+	curr.pE = NULL;
+
+	stack.clear();
+	stack.push(curr);
+
+	while (!stack.isEmpty()) {
+		curr = stack.pop();
+		while (curr.pB == NULL) {
+			tmp = dynamic_cast<TPoint*>(curr.tC->GetBegin());
+			if (tmp != NULL) {
+				curr.pB = tmp;
+			}
+			else {
+				stack.push(curr);
+				curr.tC = dynamic_cast<TChart*>(curr.tC->GetBegin());
+			}
+		}
+
+		if (curr.pE == NULL) {
+			tmp = dynamic_cast<TPoint*>(curr.tC->GetEnd());
+			if (tmp != NULL) {
+				curr.pE = tmp;
+			}
+			else {
+				stack.push(curr);
+				curr.tC = dynamic_cast<TChart*>(curr.tC->GetEnd());
+				curr.pB = NULL;
+				stack.push(curr);
+			}
+		}
+
+		if ((curr.pB != NULL) && (curr.pE != NULL)) {
+			
+		}
+	}
+
+	return false;
 }
 
 

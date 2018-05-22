@@ -37,5 +37,7 @@ public:
 	void SetRes(TChart* res);
 
 	bool GetFirst();
+
+	bool Delete();
 };
 
