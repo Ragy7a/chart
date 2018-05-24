@@ -8,6 +8,7 @@
 TChart::TChart(TRoot *pB, TRoot *pE) {
 	pBegin = pB;
 	pEnd = pE;
+	pNull = new TPoint(0, 0);
 }
 
 void TChart::SetBegin(TRoot *pB) {
@@ -103,17 +104,19 @@ void TChart::Draw(Graphics^ gr, Pen^ pen) {
 		}
 
 		if ((curr.pB != NULL) && (curr.pE != NULL)) {
-			Pen^ tmpPen = pen;
+			if (curr.pE != pNull) {
+				Pen^ tmpPen = pen;
 
-			if (curr.tC->active == true) {
-				pen =  gcnew Pen(Brushes::Red, 3.0f);
+				if (curr.tC->active == true) {
+					pen = gcnew Pen(Brushes::Red, 3.0f);
+				}
+				gr->DrawLine(pen,
+					Point(curr.pB->GetX(), curr.pB->GetY()),
+					Point(curr.pE->GetX(), curr.pE->GetY())
+				);
+
+				pen = tmpPen;
 			}
-			gr->DrawLine(pen,
-				Point(curr.pB->GetX(), curr.pB->GetY()),
-				Point(curr.pE->GetX(), curr.pE->GetY())
-			);
-
-			pen = tmpPen;
 
 			tmp = curr.pE;
 			if (!stack.isEmpty()) {
@@ -165,7 +168,7 @@ TRoot* TChart::Move(Graphics^ gr, TRoot* curr, int dx, int dy) {
 
 void TChart::Move(Graphics^ gr, int dx, int dy) {
 	Hide(gr);
-	Move(gr, pBegin, dx, dy);
+	Move(gr, this, dx, dy);
 	Show(gr);
 }
 
@@ -207,16 +210,28 @@ bool TChart::Find(int tx, int ty) {
 		}
 
 		if ((curr.pB != NULL) && (curr.pE != NULL)) {
-			if ((abs(curr.pB->GetX() - tx) < 20) && (abs(curr.pB->GetY() - ty) < 20)) {
+			if ((abs(curr.pB->GetX() - tx) < 10) && (abs(curr.pB->GetY() - ty) < 10)) {
 				pRes = curr.tC;
 				first = true;
 				return true;
 			}
 
-			if ((abs(curr.pE->GetX() - tx) < 20) && (abs(curr.pE->GetY() - ty) < 20)) {
+			if ((abs(curr.pE->GetX() - tx) < 10) && (abs(curr.pE->GetY() - ty) < 10)) {
 				pRes = curr.tC;
 				first = false;
 				return true;
+			}
+
+			tmp = curr.pE;
+			if (!stack.isEmpty()) {
+				curr = stack.pop();
+				if (curr.pB == NULL) {
+					curr.pB = tmp;
+				}
+				else {
+					curr.pE = tmp;
+				}
+				stack.push(curr);
 			}
 		}
 	}
@@ -273,11 +288,13 @@ bool TChart::FindLine(int x0, int y0) {
 
 			double distance = abs((y2 - y1) * x0 - (x2 - x1) * y0 + x2 * y1 - y2 * x1) / sqrt(pow((y2 - y1), 2) + pow((x2 - x1), 2));
 
-			if (distance < 30.0) {
-				pRes = curr.tC;
-				if (pRes->active == true) pRes->active = false;
-				else pRes->active = true;
-				isFounded = true;
+			if (distance < 5.0) {
+				if (!isFounded) {
+					pRes = curr.tC;
+					if (pRes->active == true) pRes->active = false;
+					else pRes->active = true;
+					isFounded = true;
+				}
 			}
 			else {
 				curr.tC->active = false;
@@ -321,6 +338,8 @@ bool TChart::Delete() {
 	TPoint *tmp;
 	TChart *prev;
 
+	TChart *foundedLine = pRes;
+
 	curr.tC = this;
 	curr.pB = NULL;
 	curr.pE = NULL;
@@ -354,12 +373,101 @@ bool TChart::Delete() {
 			}
 		}
 
+		if (curr.tC->GetBegin() == pRes){
+			curr.tC->SetBegin(pRes->GetEnd());
+			if (pRes->GetBegin()) {
+				//TRoot* newNull = new TPoint(0, 0);
+				/*TPoint* linkedVertex = NULL;
+				TChart* tmp = pRes;
+
+				while (tmp->GetEnd()) {
+					linkedVertex = dynamic_cast<TPoint*>(tmp->GetEnd());
+
+					if (linkedVertex == NULL) {
+						tmp = dynamic_cast<TChart* >(tmp->GetEnd());
+					}
+					else break;
+				}*/
+
+				if (dynamic_cast<TPoint*>(pRes->GetBegin()) == NULL) {
+					*ptpNull = new TChart(pRes->GetBegin(), pNull);
+					//(dynamic_cast<TChart*>(*ptpNull))->SetEnd(pRes->GetEnd());
+					//pNull = newNull;
+
+					//TRoot* newPtpNull = (dynamic_cast<TChart*>(*ptpNull))->GetBegin();
+					setPtpNull((dynamic_cast<TChart*>(*ptpNull))->GetEndPointerAddr());
+				}
+				return true;
+			}
+		}else if (curr.tC->GetEnd() == pRes) {
+			curr.tC->SetEnd(pRes->GetEnd());
+			if (pRes->GetBegin()){
+				//TRoot* newNull = new TPoint(0, 0);
+				/*TPoint* linkedVertex = NULL;
+				TChart* tmp = pRes;
+
+				while (tmp->GetEnd()) {
+				linkedVertex = dynamic_cast<TPoint*>(tmp->GetEnd());
+
+				if (linkedVertex == NULL) {
+				tmp = dynamic_cast<TChart* >(tmp->GetEnd());
+				}
+				else break;
+				}*/
+
+				if (dynamic_cast<TPoint*>(pRes->GetBegin()) == NULL) {
+					*ptpNull = new TChart(pRes->GetBegin(), pNull);
+					//(dynamic_cast<TChart*>(*ptpNull))->SetEnd(pRes->GetEnd());
+					//pNull = newNull;
+
+					//TRoot* newPtpNull = (dynamic_cast<TChart*>(*ptpNull))->GetBegin();
+					setPtpNull((dynamic_cast<TChart*>(*ptpNull))->GetEndPointerAddr());
+				}
+
+				return true;
+			}
+		}
+
 		if ((curr.pB != NULL) && (curr.pE != NULL)) {
-			
+			tmp = curr.pE;
+			if (!stack.isEmpty()) {
+				curr = stack.pop();
+				if (curr.pB == NULL) {
+					curr.pB = tmp;
+				}
+				else {
+					curr.pE = tmp;
+				}
+				stack.push(curr);
+			}
 		}
 	}
 
 	return false;
+}
+
+TRoot** TChart::GetPtpNull() {
+	return ptpNull;
+}
+
+void TChart::setPtpNull(TRoot** _ptpNull) {
+	ptpNull = _ptpNull;
+}
+
+TRoot* TChart::GetPNull() {
+	return pNull;
+}
+
+void TChart::setPNull(TRoot* _pNull) {
+	pNull = _pNull;
+}
+
+TRoot** TChart::GetBeginPointerAddr() {
+	return &pBegin;
+}
+
+TRoot** TChart::GetEndPointerAddr() {
+	return &pEnd;
 }
 
 

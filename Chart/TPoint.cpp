@@ -13,12 +13,12 @@ TPoint::~TPoint()
 }
 
 void TPoint::Show(Graphics^ gr) {
-	gr->DrawEllipse(Pens::Black, x - 2, y - 2, x + 2, y + 2);
+	gr->FillEllipse(Brushes::Black, x - 2, y - 2, 2, 2);
 	visible = true;
 }
 
 void TPoint::Hide(Graphics^ gr) {
-	gr->DrawEllipse(Pens::White, x - 2, y - 2, x + 2, y + 2);
+	gr->FillEllipse(Brushes::White, x - 2, y - 2, 2, 2);
 	visible = true;
 }
 

@@ -26,8 +26,12 @@ namespace CppCLR_WinformsProjekt {
 	private: System::Windows::Forms::Button^  bShow;
 	private: System::Windows::Forms::Button^  bHide;
 	private: System::Windows::Forms::Button^  bDelete;
+	private: System::Windows::Forms::Button^  bMove;
 	protected:
 		bool flag;
+		bool isMove;
+
+		int lastX, lastY;
 
 	public:
 		Form1(void)
@@ -36,6 +40,9 @@ namespace CppCLR_WinformsProjekt {
 			gr = pictureBox->CreateGraphics();
 			pFirst = NULL;
 			flag = false;
+			isMove = false;
+			lastX = -1;
+			lastY = -1;
 			//
 			//TODO: Konstruktorcode hier hinzufügen.
 			//
@@ -73,6 +80,7 @@ namespace CppCLR_WinformsProjekt {
 			this->bShow = (gcnew System::Windows::Forms::Button());
 			this->bHide = (gcnew System::Windows::Forms::Button());
 			this->bDelete = (gcnew System::Windows::Forms::Button());
+			this->bMove = (gcnew System::Windows::Forms::Button());
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox))->BeginInit();
 			this->SuspendLayout();
 			// 
@@ -126,11 +134,22 @@ namespace CppCLR_WinformsProjekt {
 			this->bDelete->UseVisualStyleBackColor = true;
 			this->bDelete->Click += gcnew System::EventHandler(this, &Form1::bDelete_Click);
 			// 
+			// bMove
+			// 
+			this->bMove->Location = System::Drawing::Point(530, 212);
+			this->bMove->Name = L"bMove";
+			this->bMove->Size = System::Drawing::Size(75, 23);
+			this->bMove->TabIndex = 5;
+			this->bMove->Text = L"Move";
+			this->bMove->UseVisualStyleBackColor = true;
+			this->bMove->Click += gcnew System::EventHandler(this, &Form1::bMove_Click);
+			// 
 			// Form1
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->ClientSize = System::Drawing::Size(701, 362);
+			this->Controls->Add(this->bMove);
 			this->Controls->Add(this->bDelete);
 			this->Controls->Add(this->bHide);
 			this->Controls->Add(this->bShow);
@@ -162,20 +181,49 @@ namespace CppCLR_WinformsProjekt {
 	}
 
 	private: System::Void pictureBox_MouseMove(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
-		if (flag) {
+		if (!isMove && flag) {
 			gr->DrawLine(Pens::White, x1, y1, x2, y2);
+			
+			x2 = e->X;
+			y2 = e->Y;
+
+			gr->DrawLine(Pens::Black, x1, y1, x2, y2);
+		}
+
+		if (isMove && flag) {
+			int dx, dy;
+			int dlen;
 
 			x2 = e->X;
 			y2 = e->Y;
+
+			if (lastX == -1) {
+				lastX = x2 - 1;
+				lastY = y2 - 1;
+			}
+
+			dx = x2 - lastX;
+			dy = y2 - lastY;
+
+			//dlen = Math::Sqrt(dy*dx + dy*dy);
+
+			//dx /= dlen;
+			//dy /= dlen;
+
+			gr->Clear(Color::White);
+			pFirst->Move(gr, dx, dy);
 			
-			gr->DrawLine(Pens::Black, x1, y1, x2, y2);
+			lastX = x2;
+			lastY = y2;
+
+			_sleep(50);
 		}
 	}
 	private: System::Void pictureBox_MouseUp(System::Object^  sender, System::Windows::Forms::MouseEventArgs^  e) {
 		TChart *tmp = new TChart();
 		TChart *tmpRes = NULL;
 
-		/*TRoot *p1Res, *p2Res;
+		/*TChart *p1Res, *p2Res;
 		bool p1First, p2First;
 		bool p1Founded, p2Founded;
 
@@ -187,61 +235,38 @@ namespace CppCLR_WinformsProjekt {
 		p2Res = pFirst->GetRes();
 		p2First = pFirst->GetFirst();*/
 
-		listBox->Items->Add(String::Format("({0},{1}); ({2},{3})", x1, y1, x2, y2));
+		if (flag && !isMove) {
+			listBox->Items->Add(String::Format("({0},{1}); ({2},{3})", x1, y1, x2, y2));
 
-		flag = false;
-		if (pFirst == NULL) {
-			p1 = new TPoint(x1, y1);
-			p2 = new TPoint(x2, y2);
+			if (pFirst == NULL) {
+				TChart* tmp;
+				TRoot* pNull;
 
-			pFirst = new TChart();
-			pFirst->SetBegin(p1);
-			pFirst->SetEnd(p2);
-			pFirst->Show(gr);
-		}
-		else {
-			if (pFirst->Find(x1, y1)) {
+				p1 = new TPoint(x1, y1);
 				p2 = new TPoint(x2, y2);
 
-				if (pFirst->GetFirst()) {
-					p1 = dynamic_cast<TPoint*>(pFirst->GetRes()->GetBegin());
-				}
-				else {
-					p1 = dynamic_cast<TPoint*>(pFirst->GetRes()->GetEnd());
-				}
-				tmp->SetBegin(p2);
-				tmp->SetEnd(p1);
+				tmp = new TChart(p2, p1);
 
-				tmpRes = pFirst->GetRes();
+				pFirst = new TChart();
+				pNull = pFirst->GetPNull();
+				pFirst->SetBegin(tmp);
+				pFirst->SetEnd(pNull);
 
-				if (pFirst->GetFirst()) {
-					tmpRes->SetBegin(tmp);
-				}
-				else {
-					tmpRes->SetEnd(tmp);
-				}
+				pFirst->setPtpNull(pFirst->GetEndPointerAddr());
+				//pFirst->Show(gr);
 			}
 			else {
-				if (pFirst->Find(x2, y2)) {
+				if (pFirst->Find(x1, y1)) {
+					p2 = new TPoint(x2, y2);
 
 					if (pFirst->GetFirst()) {
-						p2 = dynamic_cast<TPoint*>(pFirst->GetRes()->GetBegin());
+						p1 = dynamic_cast<TPoint*>(pFirst->GetRes()->GetBegin());
 					}
 					else {
-						p2 = dynamic_cast<TPoint*>(pFirst->GetRes()->GetEnd());
+						p1 = dynamic_cast<TPoint*>(pFirst->GetRes()->GetEnd());
 					}
-					if (tmpRes != NULL) {
-						tmp->SetBegin(p2);
-						tmp->SetEnd(p1);
-					}
-					else {
-						TChart *tmpP2 = new TChart();
-
-						p1 = new TPoint(x1, y1);
-
-						tmp->SetBegin(p2);
-						tmp->SetEnd(p1);
-					}
+					tmp->SetBegin(p2);
+					tmp->SetEnd(p1);
 
 					tmpRes = pFirst->GetRes();
 
@@ -252,8 +277,56 @@ namespace CppCLR_WinformsProjekt {
 						tmpRes->SetEnd(tmp);
 					}
 				}
+				else {
+					if (pFirst->Find(x2, y2)) {
+
+						if (pFirst->GetFirst()) {
+							p2 = dynamic_cast<TPoint*>(pFirst->GetRes()->GetBegin());
+						}
+						else {
+							p2 = dynamic_cast<TPoint*>(pFirst->GetRes()->GetEnd());
+						}
+						if (tmpRes != NULL) {
+							tmp->SetBegin(p2);
+							tmp->SetEnd(p1);
+						}
+						else {
+							TChart *tmpP2 = new TChart();
+
+							p1 = new TPoint(x1, y1);
+
+							tmp->SetBegin(p2);
+							tmp->SetEnd(p1);
+						}
+
+						tmpRes = pFirst->GetRes();
+
+						if (pFirst->GetFirst()) {
+							tmpRes->SetBegin(tmp);
+						}
+						else {
+							tmpRes->SetEnd(tmp);
+						}
+					}
+					else {
+						TPoint *firstVertex = new TPoint(x1, y1);
+						TPoint *secondVertex = new TPoint(x2, y2);
+
+						TChart *edgeChart = new TChart(secondVertex, firstVertex);
+						TChart *nullChart = new TChart(edgeChart, pFirst->GetPNull());
+
+						TRoot** ptpNull = pFirst->GetPtpNull();
+						(*ptpNull) = nullChart;
+
+						TRoot** tmp = nullChart->GetEndPointerAddr();
+						pFirst->setPtpNull(tmp);
+					}
+				}
 			}
+			pFirst->Hide(gr);
+			pFirst->Show(gr);
 		}
+		flag = false;
 	}
 private: System::Void bShow_Click(System::Object^  sender, System::EventArgs^  e) {
 	if (!pFirst->GetVisible()) {
@@ -269,6 +342,25 @@ private: System::Void bHide_Click(System::Object^  sender, System::EventArgs^  e
 }
 
 private: System::Void bDelete_Click(System::Object^  sender, System::EventArgs^  e) {
+	if (pFirst->GetRes() != NULL) {
+		pFirst->Delete();
+		pFirst->Hide(gr);
+		gr->Clear(Color::White);
+		pFirst->Show(gr);
+	}
+}
+private: System::Void bMove_Click(System::Object^  sender, System::EventArgs^  e) {
+	if (isMove) {
+		isMove = false;
+		this->Cursor = Cursors::Default;
+	}
+	else {
+		isMove = true;
+		this->Cursor = Cursors::SizeAll;
+
+		lastX = -1;
+		lastY = -1;
+	}
 }
 };
 }

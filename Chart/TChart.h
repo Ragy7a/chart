@@ -7,6 +7,8 @@ class TChart : public TRoot
 {
 protected:
 	TRoot *pBegin, *pEnd;
+	TRoot *pNull;
+	TRoot **ptpNull;
 	TChart * pRes;
 	bool first;
 	Stack<TCurrLine> stack;
@@ -39,5 +41,15 @@ public:
 	bool GetFirst();
 
 	bool Delete();
+	
+	TRoot** GetPtpNull();
+	void setPtpNull(TRoot** _ptpNull);
+
+	TRoot* GetPNull();
+	void setPNull(TRoot* _pNull);
+
+	TRoot** GetBeginPointerAddr();
+	TRoot** GetEndPointerAddr();
+
 };
 

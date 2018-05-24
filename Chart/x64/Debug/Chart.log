@@ -1,4 +1,7 @@
-﻿  TChart.cpp
+﻿  CppCLR_WinformsProjekt.cpp
+c:\users\lexat\documents\github\chart\chart\Form1.h(219): warning C4996: '_sleep': This function or variable has been superceded by newer library or operating system functionality. Consider using Sleep instead. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.16299.0\ucrt\stdlib.h(1282): note:  см. объявление "_sleep"
+c:\users\lexat\documents\github\chart\chart\Form1.h(195): warning C4101: dlen: неиспользованная локальная переменная
   AssemblyInfo.obj : /DEBUG:FASTLINK не поддерживается, если присутствует управляемый код; выполняется перезапуск компоновки с /DEBUG:FULL
   Chart.vcxproj -> C:\Users\lexat\Documents\GitHub\chart\Chart\x64\Debug\Chart.exe
   Chart.vcxproj -> C:\Users\lexat\Documents\GitHub\chart\Chart\x64\Debug\Chart.pdb (Partial PDB)
