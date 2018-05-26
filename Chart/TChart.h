@@ -2,6 +2,7 @@
 #include "TRoot.h"
 #include "stack.h"
 #include "TCurrLine.h"
+#include <string>
 
 class TChart : public TRoot
 {
@@ -31,8 +32,13 @@ public:
 	TRoot* Draw(Graphics^ gr, TRoot *curr, Pen^ pen);
 	TRoot* Move(Graphics^ gr, TRoot *curr, int dx ,int dy);
 
-	bool FindLine(int tx, int ty);
+	TRoot* RecursiveSave(TRoot *curr, std::ofstream&);
+	//TRoot* RecursiveRead(TRoot* curr, std::ifstream&);
 
+	void ReadFromFile(std::string filename);
+	void SaveToFile(std::string filename);
+
+	bool FindLine(int tx, int ty);
 	bool Find(int tx, int ty);
 
 	TChart* GetRes();

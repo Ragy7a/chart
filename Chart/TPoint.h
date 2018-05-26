@@ -1,5 +1,8 @@
 #pragma once
-#include "TChart.h"
+#include "TRoot.h"
+#include <iostream>
+#include <fstream>
+
 class TPoint :	public TRoot
 {
 protected:
@@ -18,5 +21,10 @@ public:
 
 	int GetX();
 	int GetY();
+
+	void ReadFromFile(std::ifstream&);
+	void SaveToFile(std::ofstream&);
+
+	void ReadFromString(std::string&);
 };
 

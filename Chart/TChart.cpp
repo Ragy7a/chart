@@ -9,6 +9,7 @@ TChart::TChart(TRoot *pB, TRoot *pE) {
 	pBegin = pB;
 	pEnd = pE;
 	pNull = new TPoint(0, 0);
+	ptpNull = NULL;
 }
 
 void TChart::SetBegin(TRoot *pB) {
@@ -376,25 +377,9 @@ bool TChart::Delete() {
 		if (curr.tC->GetBegin() == pRes){
 			curr.tC->SetBegin(pRes->GetEnd());
 			if (pRes->GetBegin()) {
-				//TRoot* newNull = new TPoint(0, 0);
-				/*TPoint* linkedVertex = NULL;
-				TChart* tmp = pRes;
-
-				while (tmp->GetEnd()) {
-					linkedVertex = dynamic_cast<TPoint*>(tmp->GetEnd());
-
-					if (linkedVertex == NULL) {
-						tmp = dynamic_cast<TChart* >(tmp->GetEnd());
-					}
-					else break;
-				}*/
 
 				if (dynamic_cast<TPoint*>(pRes->GetBegin()) == NULL) {
 					*ptpNull = new TChart(pRes->GetBegin(), pNull);
-					//(dynamic_cast<TChart*>(*ptpNull))->SetEnd(pRes->GetEnd());
-					//pNull = newNull;
-
-					//TRoot* newPtpNull = (dynamic_cast<TChart*>(*ptpNull))->GetBegin();
 					setPtpNull((dynamic_cast<TChart*>(*ptpNull))->GetEndPointerAddr());
 				}
 				return true;
@@ -402,25 +387,9 @@ bool TChart::Delete() {
 		}else if (curr.tC->GetEnd() == pRes) {
 			curr.tC->SetEnd(pRes->GetEnd());
 			if (pRes->GetBegin()){
-				//TRoot* newNull = new TPoint(0, 0);
-				/*TPoint* linkedVertex = NULL;
-				TChart* tmp = pRes;
-
-				while (tmp->GetEnd()) {
-				linkedVertex = dynamic_cast<TPoint*>(tmp->GetEnd());
-
-				if (linkedVertex == NULL) {
-				tmp = dynamic_cast<TChart* >(tmp->GetEnd());
-				}
-				else break;
-				}*/
-
+				
 				if (dynamic_cast<TPoint*>(pRes->GetBegin()) == NULL) {
 					*ptpNull = new TChart(pRes->GetBegin(), pNull);
-					//(dynamic_cast<TChart*>(*ptpNull))->SetEnd(pRes->GetEnd());
-					//pNull = newNull;
-
-					//TRoot* newPtpNull = (dynamic_cast<TChart*>(*ptpNull))->GetBegin();
 					setPtpNull((dynamic_cast<TChart*>(*ptpNull))->GetEndPointerAddr());
 				}
 
@@ -468,6 +437,131 @@ TRoot** TChart::GetBeginPointerAddr() {
 
 TRoot** TChart::GetEndPointerAddr() {
 	return &pEnd;
+}
+
+TRoot* TChart::RecursiveSave(TRoot *curr, std::ofstream& ofs) {
+	TPoint *tp;
+	TChart *tc;
+
+	visible = true;
+
+	tp = dynamic_cast<TPoint*>(curr);
+	if (tp != NULL) {
+		tp->SaveToFile(ofs);
+		if (curr == pNull) ofs << "o";
+		ofs << std::endl;
+
+		return tp;
+	}
+	else {
+		tc = dynamic_cast<TChart*>(curr);
+		if (tc != NULL) {
+			ofs << "@" << std::endl;
+			TPoint* bp = dynamic_cast<TPoint*>(RecursiveSave(tc->GetBegin(), ofs));
+			ofs << "#" << std::endl;
+			ofs << "@" << std::endl;
+			TPoint* ep = dynamic_cast<TPoint*>(RecursiveSave(tc->GetEnd(), ofs));
+			ofs << "#" << std::endl;
+
+			return ep;
+		}
+
+		return tc;
+	}
+
+	return tp;
+}
+
+/*TRoot* TChart::RecursiveRead(TRoot* curr, std::ifstream& ifs) {
+	
+}*/
+
+void TChart::ReadFromFile(std::string filename) {
+	std::string str;
+	Stack<TRoot* > stack;
+	std::ifstream ifs;
+	TChart* pFirst = NULL;
+	bool isFirst = false;
+
+	TChart *tc = NULL, *tmp = NULL;
+	TPoint *tp = NULL;
+
+	ifs.open(filename);	
+	if (!ifs.is_open())return;
+
+	tc = new TChart(NULL, NULL);
+	pFirst = tc;
+	stack.push(tc);
+
+	while (!ifs.eof()) {
+		tc = NULL, tmp = NULL, tp = NULL;
+		
+		bool isNull = false;
+
+		ifs >> str;
+
+		if (str == "@") {
+			if (!stack.isEmpty())
+				tc = dynamic_cast<TChart* >(stack.pop());
+			tmp = new TChart(NULL, NULL);
+			//if (pFirst == NULL) pFirst = tmp;
+			if (tc != NULL) {
+				if (tc->GetBegin() == NULL)
+					tc->SetBegin(tmp);
+				else tc->SetEnd(tmp);
+				stack.push(tc);
+			}
+			stack.push(tmp);
+		}
+
+		if (str == "#") {
+			stack.pop();
+		}
+
+		if (str[0] == '(') {
+			if (str[str.length() - 1] == 'o') isNull = true;
+			else isNull = false;
+
+			stack.pop();
+			tc = dynamic_cast<TChart* >(stack.pop());
+			tp = new TPoint();
+			tp->ReadFromString(str);
+
+			if (isNull)
+				pNull = tp;
+
+			if (tc->GetEnd() == NULL) {
+				tc->SetBegin(tp);
+			}
+			else {
+				if (isNull) {
+					if(tc != pFirst)
+						ptpNull = tc->GetEndPointerAddr();
+					else isFirst = true;
+				}
+				tc->SetEnd(tp);
+			}
+			stack.push(tc);
+			stack.push(tp);
+		}
+	}
+
+	//if (!stack.isEmpty())
+	//	pFirst = dynamic_cast<TChart* >(stack.pop());
+
+	pBegin = pFirst->pBegin;
+	pEnd = pFirst->pEnd;
+
+	if (isFirst) ptpNull = &pEnd;
+
+	ifs.close();
+}
+
+void TChart::SaveToFile(std::string filename) {
+	std::ofstream ofs;
+	ofs.open(filename);
+	RecursiveSave(this, ofs);
+	ofs.close();
 }
 
 

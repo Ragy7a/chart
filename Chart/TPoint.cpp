@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "TPoint.h"
-
+#include <regex>
 
 TPoint::TPoint(int _x, int _y){
 	x = _x;
@@ -44,5 +44,42 @@ void TPoint::SetX(int _x) {
 void TPoint::SetY(int _y) {
 	y = _y;
 }
+
+void TPoint::ReadFromFile(std::ifstream& ifs) {
+	std::smatch match;
+	std::string thisLine;
+	std::regex reg("(\\d+)");
+	
+	ifs >> thisLine;
+	if (std::regex_search(thisLine, match, reg))
+	{
+		x = std::stoi(match.str());
+		thisLine = match.suffix().str();
+	}
+	if (std::regex_search(thisLine, match, reg)) {
+		y = std::stoi(match.str());
+	}
+}
+
+void TPoint::SaveToFile(std::ofstream& ofs) {
+	ofs << "(" << x << "," << y << ")";
+}
+
+void TPoint::ReadFromString(std::string& thisLine) {
+	std::smatch match;
+	std::regex reg("(\\d+)");
+	std::string tmp = thisLine;
+
+	if (std::regex_search(tmp, match, reg))
+	{
+		x = std::stoi(match.str());
+		tmp = match.suffix().str();
+	}
+	if (std::regex_search(tmp, match, reg)) {
+		y = std::stoi(match.str());
+	}
+}
+
+
 
 

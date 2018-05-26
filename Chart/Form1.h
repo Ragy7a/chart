@@ -32,6 +32,11 @@ namespace CppCLR_WinformsProjekt {
 		bool isMove;
 
 		int lastX, lastY;
+	private: System::Windows::Forms::Label^  lPointOut;
+	private: System::Windows::Forms::Button^  bSave;
+	private: System::Windows::Forms::Label^  lPointOut0;
+	private: System::Windows::Forms::Button^  bRead;
+	protected:
 
 	public:
 		Form1(void)
@@ -81,6 +86,10 @@ namespace CppCLR_WinformsProjekt {
 			this->bHide = (gcnew System::Windows::Forms::Button());
 			this->bDelete = (gcnew System::Windows::Forms::Button());
 			this->bMove = (gcnew System::Windows::Forms::Button());
+			this->lPointOut = (gcnew System::Windows::Forms::Label());
+			this->bSave = (gcnew System::Windows::Forms::Button());
+			this->bRead = (gcnew System::Windows::Forms::Button());
+			this->lPointOut0 = (gcnew System::Windows::Forms::Label());
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox))->BeginInit();
 			this->SuspendLayout();
 			// 
@@ -144,11 +153,51 @@ namespace CppCLR_WinformsProjekt {
 			this->bMove->UseVisualStyleBackColor = true;
 			this->bMove->Click += gcnew System::EventHandler(this, &Form1::bMove_Click);
 			// 
+			// lPointOut
+			// 
+			this->lPointOut->AutoSize = true;
+			this->lPointOut->Location = System::Drawing::Point(530, 337);
+			this->lPointOut->Name = L"lPointOut";
+			this->lPointOut->Size = System::Drawing::Size(0, 13);
+			this->lPointOut->TabIndex = 6;
+			// 
+			// bSave
+			// 
+			this->bSave->Location = System::Drawing::Point(530, 242);
+			this->bSave->Name = L"bSave";
+			this->bSave->Size = System::Drawing::Size(75, 23);
+			this->bSave->TabIndex = 7;
+			this->bSave->Text = L"Save";
+			this->bSave->UseVisualStyleBackColor = true;
+			this->bSave->Click += gcnew System::EventHandler(this, &Form1::bSave_Click);
+			// 
+			// bRead
+			// 
+			this->bRead->Location = System::Drawing::Point(529, 271);
+			this->bRead->Name = L"bRead";
+			this->bRead->Size = System::Drawing::Size(75, 23);
+			this->bRead->TabIndex = 8;
+			this->bRead->Text = L"Read";
+			this->bRead->UseVisualStyleBackColor = true;
+			this->bRead->Click += gcnew System::EventHandler(this, &Form1::bRead_Click);
+			// 
+			// lPointOut0
+			// 
+			this->lPointOut0->AutoSize = true;
+			this->lPointOut0->Location = System::Drawing::Point(533, 314);
+			this->lPointOut0->Name = L"lPointOut0";
+			this->lPointOut0->Size = System::Drawing::Size(0, 13);
+			this->lPointOut0->TabIndex = 9;
+			// 
 			// Form1
 			// 
 			this->AutoScaleDimensions = System::Drawing::SizeF(6, 13);
 			this->AutoScaleMode = System::Windows::Forms::AutoScaleMode::Font;
 			this->ClientSize = System::Drawing::Size(701, 362);
+			this->Controls->Add(this->lPointOut0);
+			this->Controls->Add(this->bRead);
+			this->Controls->Add(this->bSave);
+			this->Controls->Add(this->lPointOut);
 			this->Controls->Add(this->bMove);
 			this->Controls->Add(this->bDelete);
 			this->Controls->Add(this->bHide);
@@ -159,6 +208,7 @@ namespace CppCLR_WinformsProjekt {
 			this->Text = L"Form1";
 			(cli::safe_cast<System::ComponentModel::ISupportInitialize^>(this->pictureBox))->EndInit();
 			this->ResumeLayout(false);
+			this->PerformLayout();
 
 		}
 #pragma endregion
@@ -361,6 +411,33 @@ private: System::Void bMove_Click(System::Object^  sender, System::EventArgs^  e
 		lastX = -1;
 		lastY = -1;
 	}
+}
+private: System::Void bSave_Click(System::Object^  sender, System::EventArgs^  e) {
+	/*
+	std::ifstream ifs;
+	std::ofstream ofs;
+	TPoint *p = new TPoint(16, 256);
+
+	ifs.open("file.txt");
+	//ofs.open("file.txt");
+	//p->SaveToFile(ofs);
+	std::string tmp("(17,255)");
+	p->Move(gr, 10, 15);
+	lPointOut0->Text = "(" + p->GetX() + "," + p->GetY() + ")";
+	p->ReadFromString(tmp);
+	lPointOut->Text = "(" + p->GetX() + "," + p->GetY() + ")";
+	*/
+	std::string filename("file.txt");
+	pFirst->SaveToFile(filename);
+}
+private: System::Void bRead_Click(System::Object^  sender, System::EventArgs^  e) {
+	std::string filename("file.txt");
+	gr->Clear(Color::White);
+
+	if (pFirst == NULL) pFirst = new TChart(NULL, NULL);
+
+	pFirst->ReadFromFile(filename);
+	pFirst->Show(gr);
 }
 };
 }
